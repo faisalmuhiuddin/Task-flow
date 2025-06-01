@@ -2,27 +2,32 @@
   "name": "taskflow-project",
   "version": "1.0.0",
   "description": "TaskFlow Collaborative Project Management Platform",
+  "main": "backend/server.js",
   "scripts": {
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && npm run dev",
     "client": "cd frontend && npm start",
     "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start"
+    "start": "cd backend && npm start",
+    "heroku-postbuild": "npm run install-all && npm run build"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "nodemon": "^3.1.10"
   },
   "keywords": [
     "task",
     "management",
     "collaboration",
     "react",
-    "nodejs"
+    "nodejs",
+    "mongodb"
   ],
   "author": "TaskFlow Team",
   "license": "MIT",
-  "main": "app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/faisalmuhiuddin/Task-flow.git"
@@ -30,6 +35,9 @@
   "bugs": {
     "url": "https://github.com/faisalmuhiuddin/Task-flow/issues"
   },
-  "homepage": "https://github.com/faisalmuhiuddin/Task-flow#readme"
+  "homepage": "https://github.com/faisalmuhiuddin/Task-flow#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
 }
-  
