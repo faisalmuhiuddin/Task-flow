@@ -1,4 +1,5 @@
-// server.js
+// server.js - Main entry point for the TaskFlow backend server
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,10 +10,18 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
 
-// Load env vars
-dotenv.config();
+// Import Routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const projectRoutes = require('./routes/projects');
+const taskRoutes = require('./routes/tasks');
+const notificationRoutes = require('./routes/notifications');
 
-// Create Express app
+// Import Middleware
+const { authenticateToken } = require('./middleware/auth');
+
+// Config
+dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -30,34 +39,39 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(helmet());
 
-// Import Routes (create these files later)
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const projectRoutes = require('./routes/projects');
-const taskRoutes = require('./routes/tasks');
+// Static Files
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+}
 
-// Import Middleware (create this file later)
-const { authenticateToken } = require('./middleware/auth');
-
-// Socket.IO setup (create this file later)
+// Socket.IO middleware and connection handling
 require('./socket')(io);
 
-// Mount Routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/projects', authenticateToken, projectRoutes);
 app.use('/api/tasks', authenticateToken, taskRoutes);
+app.use('/api/notifications', authenticateToken, notificationRoutes);
 
-// Error handling middleware
+// Serve the React frontend in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+  });
+}
+
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.statusCode || 500).json({
     success: false,
-    message: err.message || 'Server Error'
+    message: err.message || 'Server Error',
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack
   });
 });
 
-// Connect to MongoDB
+// MongoDB Connection
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/taskflow', {
@@ -67,6 +81,7 @@ const connectDB = async () => {
     console.log('MongoDB Connected...');
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
+    // Exit process with failure
     process.exit(1);
   }
 };
@@ -77,4 +92,11 @@ connectDB().then(() => {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Promise Rejection:', err);
+  // Close server & exit process
+  server.close(() => process.exit(1));
 });

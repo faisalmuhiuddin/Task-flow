@@ -1,0 +1,35 @@
+{
+  "name": "taskflow-project",
+  "version": "1.0.0",
+  "description": "TaskFlow Collaborative Project Management Platform",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": [
+    "task",
+    "management",
+    "collaboration",
+    "react",
+    "nodejs"
+  ],
+  "author": "TaskFlow Team",
+  "license": "MIT",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/faisalmuhiuddin/Task-flow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/faisalmuhiuddin/Task-flow/issues"
+  },
+  "homepage": "https://github.com/faisalmuhiuddin/Task-flow#readme"
+}
+  
