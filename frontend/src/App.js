@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
+
 import { AuthProvider } from './contexts/AuthContext';
 import { SocketProvider } from './contexts/SocketContext';
 import PrivateRoute from './components/PrivateRoute';
@@ -13,57 +14,35 @@ import Dashboard from './components/Dashboard/Dashboard';
 import ProjectDetail from './components/Projects/ProjectDetail';
 import './App.css';
 
-// Material-UI theme configuration
 const theme = createTheme({
   palette: {
-    mode: 'light',
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: '#2563eb',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#64748b',
     },
     background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
+      default: '#f8fafc',
     },
   },
   typography: {
-    fontFamily: [
-      'Roboto',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 600,
-    },
-    h6: {
-      fontWeight: 600,
-    },
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   },
   components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+          borderRadius: '8px',
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          borderRadius: '6px',
         },
       },
     },
@@ -81,13 +60,14 @@ function App() {
               <Toaster
                 position="top-right"
                 toastOptions={{
-                  duration: 4000,
+                  duration: 3000,
                   style: {
                     background: '#363636',
                     color: '#fff',
                   },
                 }}
               />
+              
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
@@ -95,26 +75,21 @@ function App() {
                 
                 {/* Private routes */}
                 <Route
-                  path="/dashboard"
+                  path="/*"
                   element={
                     <PrivateRoute>
                       <Navbar />
-                      <Dashboard />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/project/:id"
-                  element={
-                    <PrivateRoute>
-                      <Navbar />
-                      <ProjectDetail />
+                      <Routes>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/projects/:id" element={<ProjectDetail />} />
+                        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                      </Routes>
                     </PrivateRoute>
                   }
                 />
                 
                 {/* Default redirect */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </div>
           </Router>
